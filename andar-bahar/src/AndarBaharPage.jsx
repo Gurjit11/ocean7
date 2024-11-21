@@ -24,7 +24,7 @@ const AndarBaharPage = () => {
   const [sectionId, setSectionId] = useState(0);
   const [section0Cards, setSection0Cards] = useState([]);
   const [section1Cards, setSection1Cards] = useState([]);
-  const [cardValue, setCardValue] = useState('');
+  const [cardValue, setCardValue] = useState("");
   const handleWin = () => {
     setShowModal(true);
   };
@@ -61,7 +61,6 @@ const AndarBaharPage = () => {
           "Content-Type": "application/json",
         },
         data: method === "PUT" ? { value: cardValue } : undefined,
-
       };
 
       // Axios call
@@ -82,21 +81,19 @@ const AndarBaharPage = () => {
           const result = response.data.result;
           console.log("result", result);
 
-        // Check the "result" field and give alerts accordingly
-        if (result === "0 wins") {
-          setWon(0);
-          stopPush();
-          handleWin();
-         
-        } else if (result === "1 wins") {
-          // alert(" 1 wins");
-          setWon(1);
-          stopPush();
-          handleWin();
-         
+          // Check the "result" field and give alerts accordingly
+          if (result === "0 wins") {
+            setWon(0);
+            stopPush();
+            handleWin();
+          } else if (result === "1 wins") {
+            // alert(" 1 wins");
+            setWon(1);
+            stopPush();
+            handleWin();
 
-          // Trigger confetti on win
-        }
+            // Trigger confetti on win
+          }
         }
 
         // PUT/PATCH: Pop the last card and replace it with the updated one
@@ -110,8 +107,7 @@ const AndarBaharPage = () => {
               console.log("Popped from section0Cards: ", poppedCard); // Log the popped card
               return updatedCards;
             });
-          } 
-          else if (section_id === 1) {
+          } else if (section_id === 1) {
             setSection1Cards((prev) => {
               const updatedCards = [...prev];
               const poppedCard = updatedCards.pop();
@@ -123,19 +119,19 @@ const AndarBaharPage = () => {
           }
           const result = response.data.result;
 
-        // Check the "result" field and give alerts accordingly
-        if (result === "0 wins") {
-          setWon(0);
-          handleWin();
-          stopPush();
-        } else if (result === "1 wins") {
-          // alert(" 1 wins");
-          setWon(1);
-          handleWin();
-          stopPush();
+          // Check the "result" field and give alerts accordingly
+          if (result === "0 wins") {
+            setWon(0);
+            handleWin();
+            stopPush();
+          } else if (result === "1 wins") {
+            // alert(" 1 wins");
+            setWon(1);
+            handleWin();
+            stopPush();
 
-          // Trigger confetti on win
-        }
+            // Trigger confetti on win
+          }
         }
       }
     } catch (error) {
@@ -144,11 +140,13 @@ const AndarBaharPage = () => {
   };
   return (
     <div className="min-h-screen bg-[#450A03] ">
-            <WinnerModal show={showModal} onClose={handleCloseModal} winner={won} />
+      <WinnerModal show={showModal} onClose={handleCloseModal} winner={won} />
 
-      <TopMenu fetchCardData={fetchCardData}
+      <TopMenu
+        fetchCardData={fetchCardData}
         cardValue={cardValue}
-        setCardValue={setCardValue} />
+        setCardValue={setCardValue}
+      />
       <div className="flex flex-col lg:flex-row justify-between p-2">
         <AndarBaharSection
           setSectionId={setSectionId}
@@ -157,7 +155,6 @@ const AndarBaharPage = () => {
           section1Cards={section1Cards}
           setSection1Cards={setSection1Cards}
           fetchCardData={fetchCardData} // Pass function down to AndarBaharSection
-
         />
 
         <ScoreAndJokerSection
@@ -170,12 +167,41 @@ const AndarBaharPage = () => {
   );
 };
 const allPlayers = ["page1", "page2", "page3", "page4", "page5", "page6"];
-const TopMenu = ({ fetchCardData }, ) => {
+const TopMenu = ({ fetchCardData }) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showBet, setShowBet] = useState(false);
   const [cardValue, setCardValue] = useState(""); // To store the card value from input
+  const [cardNumber, setCardNumber] = useState(""); // To store the selected card number
+  const [cardGroup, setCardGroup] = useState(""); // To store the selected card group
+  const [showCardPopup, setShowCardPopup] = useState(false); // To toggle the popup
+  const cardNumbers = [
+    "A",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "T",
+    "J",
+    "Q",
+    "K",
+  ];
+  const cardGroups = ["H", "S", "D", "C"];
+
+  const handleCardUpdate = () => {
+    if (cardNumber && cardGroup) {
+      const cardValue = `${cardNumber}${cardGroup}`; // Combine card number and group
+      fetchCardData("PUT", cardValue); // Pass the combined card value to the function
+      setShowCardPopup(false); // Close the popup after updating the card
+    } else {
+      alert("Please select both card number and group.");
+    }
+  };
 
   const current_players = [
     "page1",
@@ -371,7 +397,6 @@ const TopMenu = ({ fetchCardData }, ) => {
               >
                 Reset
               </button>
-
               <button
                 className="block w-full text-left px-4 py-2 hover:bg-red-700"
                 onClick={() => {
@@ -387,7 +412,6 @@ const TopMenu = ({ fetchCardData }, ) => {
               >
                 Select Player
               </button>
-
               {/* Render Popup Conditionally */}
               {showPopup && (
                 <PlayerSelectionPopup setShowPopup={setShowPopup} />
@@ -398,28 +422,114 @@ const TopMenu = ({ fetchCardData }, ) => {
               >
                 Change Bets
               </button>
-
               {showBet && <BetPopUp setShowBet={setShowBet} />}
               <button
                 onClick={startPush}
                 disabled={isPushing} // Disable the start button when pushing is active
-                className={`block w-full text-left px-4 py-2 hover:bg-red-700 ${isPushing ? "opacity-50" : ""
-                  }`}
+                className={`block w-full text-left px-4 py-2 hover:bg-red-700 ${
+                  isPushing ? "opacity-50" : ""
+                }`}
               >
                 Start Automatic Game
               </button>
               <button
-              onClick={() => fetchCardData("PUT", cardValue)}  // Pass the cardValue to the updateCard function
-              className="block w-full text-left px-4 py-2 hover:bg-red-700"
-            >
-              Update Card
-            </button>            </div>
+                onClick={() => setShowCardPopup(true)} // Pass the cardValue to the updateCard function
+                className="block w-full text-left px-4 py-2 hover:bg-red-700"
+              >
+                Update Card
+              </button>{" "}
+              {showCardPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                  <div className="bg-[#971909] border-2 border-yellow-600 rounded-lg p-6 w-80 shadow-lg">
+                    <h2 className="text-yellow-300 text-lg mb-4 text-center">
+                      Select Card
+                    </h2>
+
+                    <div className="mb-4">
+                      <label
+                        htmlFor="card-number"
+                        className="block text-yellow-300 mb-2"
+                      >
+                        Select Card Number
+                      </label>
+                      <select
+                        id="card-number"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        className="p-2 w-full border bg-[#971909] text-yellow-300 border-yellow-600 rounded-md"
+                      >
+                        <option
+                          value=""
+                          className="bg-[#971909] text-yellow-300"
+                        >
+                          -- Select Number --
+                        </option>
+                        {cardNumbers.map((number) => (
+                          <option
+                            key={number}
+                            value={number}
+                            className="bg-[#971909] text-yellow-300 hover:bg-yellow-700 hover:text-white"
+                          >
+                            {number}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mb-4">
+                      <label
+                        htmlFor="card-group"
+                        className="block text-yellow-300 mb-2"
+                      >
+                        Select Card Group
+                      </label>
+                      <select
+                        id="card-group"
+                        value={cardGroup}
+                        onChange={(e) => setCardGroup(e.target.value)}
+                        className="p-2 w-full border bg-[#971909] text-yellow-300 border-yellow-600 rounded-md"
+                      >
+                        <option
+                          value=""
+                          className="bg-[#971909] text-yellow-300"
+                        >
+                          -- Select Group --
+                        </option>
+                        {cardGroups.map((group) => (
+                          <option
+                            key={group}
+                            value={group}
+                            className="bg-[#971909] text-yellow-300 hover:bg-yellow-700 hover:text-white"
+                          >
+                            {group}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => setShowCardPopup(false)}
+                        className="bg-gray-600 text-yellow-300 px-4 py-2 rounded-md hover:bg-gray-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleCardUpdate}
+                        className="bg-red-700 text-yellow-300 px-4 py-2 rounded-md hover:bg-red-800"
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
-      <div className="font-questrial p-4 rounded-lg shadow-lg text-left md:w-1/4 w-full relative">
-
-        <div className="flex justify-center items-center mt-3">
+      {/* <div className="font-questrial p-4 rounded-lg shadow-lg text-left md:w-1/4 w-full relative"> */}
+      {/* <div className="flex justify-center items-center mt-3">
           <input
             type="text"
             value={cardValue}
@@ -427,21 +537,20 @@ const TopMenu = ({ fetchCardData }, ) => {
             placeholder="Enter Card Value"
             className="p-2 border border-yellow-600 rounded-md"
           />
-        </div>
+        </div> */}
 
-        {showDropdown && (
+      {/* {showDropdown && (
           <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-[#971909] text-yellow-300 border-2 border-[#D6AB5D] shadow-lg p-2 gap-2">
-           
-
             <button
-              onClick={() => fetchCardData("PUT", cardValue)}  // Pass the cardValue to the updateCard function
+              onClick={handleCardUpdate} // Pass the cardValue to the updateCard function
               className="block w-full text-left px-4 py-2 hover:bg-red-700"
             >
               Update Card
             </button>
           </div>
-        )}
-      </div>
+        )} */}
+
+      {/* </div> */}
     </div>
   );
 };
@@ -453,17 +562,12 @@ const AndarBaharSection = ({
   section1Cards,
   setSection1Cards,
   fetchCardData, // Receive the fetchCardData function
-
 }) => {
   // const [section0Cards, setSection0Cards] = useState([]);
   // const [section1Cards, setSection1Cards] = useState([]);
   const [revealedCards, setRevealedCards] = useState({});
   const [won, setWon] = useState(-1);
   const [isAutoFetching, setIsAutoFetching] = useState(true);
-
-
-
-
 
   useEffect(() => {
     if (isAutoFetching) {
@@ -492,7 +596,6 @@ const AndarBaharSection = ({
         }
       );
       const data = await response.json();
-
     } catch (error) {
       console.error("Error stopping the push:", error);
     }
@@ -575,8 +678,9 @@ const ScoreAndJokerSection = ({ sectionId, section0Cards, section1Cards }) => {
       {/* Score */}
       <div className="p-2">
         <div
-          className={`flex justify-between items-center p-5 ${sectionId === 1 ? "bg-[#07740C]" : "bg-[#FFF8D6]"
-            } text-black text-2xl font-bold mb-2`}
+          className={`flex justify-between items-center p-5 ${
+            sectionId === 1 ? "bg-[#07740C]" : "bg-[#FFF8D6]"
+          } text-black text-2xl font-bold mb-2`}
         >
           <div className="flex items-center space-x-2">
             <div className="w-12 h-16 overflow-clip">
@@ -586,8 +690,9 @@ const ScoreAndJokerSection = ({ sectionId, section0Cards, section1Cards }) => {
           </div>
         </div>
         <div
-          className={`flex justify-between items-center p-5 ${sectionId === 0 ? "bg-[#07740C]" : "bg-[#FFF8D6]"
-            } text-black text-2xl font-bold`}
+          className={`flex justify-between items-center p-5 ${
+            sectionId === 0 ? "bg-[#07740C]" : "bg-[#FFF8D6]"
+          } text-black text-2xl font-bold`}
         >
           <div className="flex items-center space-x-2">
             <div className="w-12 h-16 pt-1 overflow-clip">
@@ -618,7 +723,6 @@ const ScoreAndJokerSection = ({ sectionId, section0Cards, section1Cards }) => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };
