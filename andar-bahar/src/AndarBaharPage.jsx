@@ -408,8 +408,12 @@ const TopMenu = ({ fetchCardData }, ) => {
               >
                 Start Automatic Game
               </button>
-              <button onClick={updateCard} className="block w-full text-left px-4 py-2 hover:bg-red-700">     Update Card          </button>
-            </div>
+              <button
+              onClick={() => fetchCardData("PUT", cardValue)}  // Pass the cardValue to the updateCard function
+              className="block w-full text-left px-4 py-2 hover:bg-red-700"
+            >
+              Update Card
+            </button>            </div>
           )}
         </div>
       </div>
@@ -427,15 +431,7 @@ const TopMenu = ({ fetchCardData }, ) => {
 
         {showDropdown && (
           <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-[#971909] text-yellow-300 border-2 border-[#D6AB5D] shadow-lg p-2 gap-2">
-            <button
-              className="block w-full text-left px-4 py-2 hover:bg-red-700"
-              onClick={() => {
-                handleReset();
-                setShowDropdown(false);
-              }}
-            >
-              Reset
-            </button>
+           
 
             <button
               onClick={() => fetchCardData("PUT", cardValue)}  // Pass the cardValue to the updateCard function
