@@ -539,13 +539,13 @@ def assign_card_to_section_A(request):
                 # Update the latest document with the new value and reset isRead to 0
                 mongo_helper.collection.update_one(
                     {"_id": latest_document["_id"]},  # Use the _id of the latest document
-                    {"$set": {"value": new_value, "isRead": 1}}
+                    {"$set": {"value": new_value, "isRead": 0, "isRead2": 0}}
                 )
                 print(f"Updated latest document {latest_document['_id']} with value: {new_value} and reset isRead to 0")
 
                 # Simulate assignment logic for the response
                 section_id = (card_assignment_counter-1) % 2  # Keep section_id logic consistent
-                # card_assignment_counter += 1
+                card_assignment_counter -= 1
                 print("card_assignment_counter",card_assignment_counter)
                 print("section_id",section_id)
                 card_value = extract_number_from_name(new_value)

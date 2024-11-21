@@ -13,12 +13,12 @@ const WinnerModal = ({ show, onClose, winner }) => {
       // Close the modal after 5 seconds
       const timer = setTimeout(() => {
         onClose();
-      }, 5000);
+      }, 500);
 
       // Stop confetti after 3 seconds
       const confettiTimer = setTimeout(() => {
         setShowConfetti(false);
-      }, 5000);
+      }, 500);
 
       return () => {
         clearTimeout(timer);

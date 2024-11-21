@@ -115,7 +115,7 @@ const AndarBaharPage = () => {
             setSection1Cards((prev) => {
               const updatedCards = [...prev];
               const poppedCard = updatedCards.pop();
-              updatedCards.push(value); // Push the new card
+              // updatedCards.push(value); // Push the new card
 
               console.log("Popped from section1Cards: ", poppedCard); // Log the popped card
               return updatedCards;
@@ -469,7 +469,7 @@ const AndarBaharSection = ({
     if (isAutoFetching) {
       const interval = setInterval(() => {
         fetchCardData("POST");
-      }, 5000);
+      }, 500);
 
       return () => clearInterval(interval); // Cleanup on unmount
     }

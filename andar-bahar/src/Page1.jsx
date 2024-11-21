@@ -45,53 +45,7 @@ const JokerAndCards = () => {
   const [revealedCards, setRevealedCards] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [won, setWon] = useState(-1);
-  // const [lastTimestamp, setLastTimestamp] = useState({}); 
 
-
-  // Function to fetch the reset status
-  // const checkResetStatus = async () => {
-  //   try {
-  //     const response = await axios.get("http://127.0.0.1:8000/myapp/api/reset_collections/");
-  //     const currentTimestamp = response.data.timestamp;
-
-  //     if (currentTimestamp !== lastTimestamp) {
-  //       // If the timestamp has changed, reset the states and reload the page
-      
-  //       setLastTimestamp(currentTimestamp);
-  //       console.log("Current timestamp:", currentTimestamp);
-  //       console.log("last timestamp:", lastTimestamp);
-  //       console.log("State has been reset");
-  //       window.location.reload();
-  //            console.log("reload now")
-
-  //     } else {
-  //       console.log("No reset, timestamp is the same");
-  //       console.log("Current timestamp:", currentTimestamp);
-  //       console.log("last timestamp:", lastTimestamp);
-
-
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking reset status:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   const fetchTimestamp = async () => {
-  //     try {
-  //       const response = await axios.get("http://127.0.0.1:8000/myapp/api/reset_collections/");
-  //       if (response.data && response.data.timestamp) {
-  //         setLastTimestamp(response.data.timestamp); // Store the initial timestamp
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching initial timestamp:", error);
-  //     }
-  //   };
-    
-  //   fetchTimestamp();
-  // }, []);
-
-
-  // Initial fetch for the joker value
   const fetchJokerValue = () => {
     axios
       .get("http://127.0.0.1:8000/myapp/api/get_joker_value/")
@@ -121,10 +75,10 @@ const JokerAndCards = () => {
         const newCard = response.data.value;
         const sectionId = response.data.section_id;
 
-        if (sectionId === 1) {
+        if (sectionId === 0) {
           setSection0Cards((prev) => [...prev, newCard]);
           revealCard(newCard, "section0");
-        } else if (sectionId === 0) {
+        } else if (sectionId === 1) {
           setSection1Cards((prev) => [...prev, newCard]);
           revealCard(newCard, "section1");
         }
@@ -135,6 +89,8 @@ const JokerAndCards = () => {
           handleWin();
           setTimeout(() => {
             window.location.reload();
+            // window.location.href = "http://example.com";
+
         }, 7000);
         } else if (result === "1 wins") {
           setWon(1);
@@ -162,11 +118,6 @@ const JokerAndCards = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Periodic check for the reset status
-  // useEffect(() => {
-  //   const resetCheckInterval = setInterval(checkResetStatus, 10000); // Check every second
-  //   return () => clearInterval(resetCheckInterval);
-  // }, []);
   const handleWin = () => {
     setShowModal(true);
   };
