@@ -16,11 +16,15 @@ import BetPopUp from "./BetPopUp";
 import PlayerSelectionPopup from "./PlayerSelectionpopUp";
 import WinnerModal from "./components/WinnerModal";
 import { useFlip } from "./context/FlipContext";
-// import { RefreshContext } from "./context/RefreshContext";
+import { usePlayerPut } from "./context/PlayerPutContext";
 import { useNavigate } from "react-router-dom";
+import Page1 from "./Page1";
+
+
 
 const AndarBaharPage = () => {
   const { toggleReveal } = useFlip();
+  const { isPut, togglePut } = usePlayerPut();
   const [sectionId, setSectionId] = useState(0);
   const [section0Cards, setSection0Cards] = useState([]);
   const [section1Cards, setSection1Cards] = useState([]);
@@ -82,40 +86,49 @@ const AndarBaharPage = () => {
           const result = response.data.result;
           console.log("result", result);
 
-        // Check the "result" field and give alerts accordingly
-        if (result === "0 wins") {
-          setWon(0);
-          stopPush();
-          handleWin();
-         
-        } else if (result === "1 wins") {
-          // alert(" 1 wins");
-          setWon(1);
-          stopPush();
-          handleWin();
-         
+          // Check the "result" field and give alerts accordingly
+          if (result === "0 wins") {
+            setWon(0);
+            stopPush();
+            handleWin();
 
-          // Trigger confetti on win
+          } else if (result === "1 wins") {
+            // alert(" 1 wins");
+            setWon(1);
+            stopPush();
+            handleWin();
+
+
+            // Trigger confetti on win
+          }
         }
-        }
+//   const { isPut, togglePut } = usePlayerPut();
 
         // PUT/PATCH: Pop the last card and replace it with the updated one
         if (method === "PUT") {
+          togglePut(true);
+
+       
+          fetchPlayer("PUT").then((data) => {
+                console.log("Fetched card data:", data);
+            });
+
+
           // PUT: Pop the last card and log it
           if (section_id === 0) {
             setSection0Cards((prev) => {
               const updatedCards = [...prev];
               const poppedCard = updatedCards.pop();
-              updatedCards.push(value); // Push the new card
+              // updatedCards.push(value); // Push the new card
               console.log("Popped from section0Cards: ", poppedCard); // Log the popped card
               return updatedCards;
             });
-          } 
+          }
           else if (section_id === 1) {
             setSection1Cards((prev) => {
               const updatedCards = [...prev];
               const poppedCard = updatedCards.pop();
-              updatedCards.push(value); // Push the new card
+              // updatedCards.push(value); // Push the new card
 
               console.log("Popped from section1Cards: ", poppedCard); // Log the popped card
               return updatedCards;
@@ -123,19 +136,19 @@ const AndarBaharPage = () => {
           }
           const result = response.data.result;
 
-        // Check the "result" field and give alerts accordingly
-        if (result === "0 wins") {
-          setWon(0);
-          handleWin();
-          stopPush();
-        } else if (result === "1 wins") {
-          // alert(" 1 wins");
-          setWon(1);
-          handleWin();
-          stopPush();
+          // Check the "result" field and give alerts accordingly
+          if (result === "0 wins") {
+            setWon(0);
+            handleWin();
+            stopPush();
+          } else if (result === "1 wins") {
+            // alert(" 1 wins");
+            setWon(1);
+            handleWin();
+            stopPush();
 
-          // Trigger confetti on win
-        }
+            // Trigger confetti on win
+          }
         }
       }
     } catch (error) {
@@ -144,7 +157,7 @@ const AndarBaharPage = () => {
   };
   return (
     <div className="min-h-screen bg-[#450A03] ">
-            <WinnerModal show={showModal} onClose={handleCloseModal} winner={won} />
+      <WinnerModal show={showModal} onClose={handleCloseModal} winner={won} />
 
       <TopMenu fetchCardData={fetchCardData}
         cardValue={cardValue}
@@ -170,7 +183,7 @@ const AndarBaharPage = () => {
   );
 };
 const allPlayers = ["page1", "page2", "page3", "page4", "page5", "page6"];
-const TopMenu = ({ fetchCardData }, ) => {
+const TopMenu = ({ fetchCardData },) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -185,38 +198,38 @@ const TopMenu = ({ fetchCardData }, ) => {
     "page5",
     "page6",
   ];
-  const updateCard = async () => {
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/myapp/api/update_last_card/"
-      );
-      if (response.data) {
-        const updatedCard = response.data.value; // New card value
-        const sectionId = response.data.section_id; // Section ID of the card to be updated
+  // const updateCard = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       "http://127.0.0.1:8000/myapp/api/update_last_card/"
+  //     );
+  //     if (response.data) {
+  //       const updatedCard = response.data.value; // New card value
+  //       const sectionId = response.data.section_id; // Section ID of the card to be updated
 
-        // Update the last card in the respective section
-        if (sectionId === 1) {
-          setSection1Cards((prev) => {
-            const updatedCards = [...prev];
-            updatedCards[updatedCards.length - 1] = updatedCard; // Replace the last card
-            return updatedCards;
-          });
-          revealCard(updatedCard, "section1"); // Optional: Trigger reveal animation
-        } else if (sectionId === 0) {
-          setSection0Cards((prev) => {
-            const updatedCards = [...prev];
-            updatedCards[updatedCards.length - 1] = updatedCard; // Replace the last card
-            return updatedCards;
-          });
-          revealCard(updatedCard, "section0"); // Optional: Trigger reveal animation
-        }
+  //       // Update the last card in the respective section
+  //       if (sectionId === 1) {
+  //         setSection1Cards((prev) => {
+  //           const updatedCards = [...prev];
+  //           updatedCards[updatedCards.length - 1] = updatedCard; // Replace the last card
+  //           return updatedCards;
+  //         });
+  //         revealCard(updatedCard, "section1"); // Optional: Trigger reveal animation
+  //       } else if (sectionId === 0) {
+  //         setSection0Cards((prev) => {
+  //           const updatedCards = [...prev];
+  //           updatedCards[updatedCards.length - 1] = updatedCard; // Replace the last card
+  //           return updatedCards;
+  //         });
+  //         revealCard(updatedCard, "section0"); // Optional: Trigger reveal animation
+  //       }
 
-        console.log("Card updated successfully:", updatedCard);
-      }
-    } catch (error) {
-      console.error("Error updating the card:", error);
-    }
-  };
+  //       console.log("Card updated successfully:", updatedCard);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating the card:", error);
+  //   }
+  // };
   const [isPushing, setIsPushing] = useState(false); // To track the pushing status
 
   const startPush = async () => {
@@ -305,6 +318,8 @@ const TopMenu = ({ fetchCardData }, ) => {
 
     fetchCurrentPlayers();
   }, []);
+
+
 
   return (
     <div className="flex flex-col md:flex-row justify-between  bg-[url('./assets/wood.png')] shadow-lg border-2 border-yellow-600">
@@ -408,7 +423,7 @@ const TopMenu = ({ fetchCardData }, ) => {
               >
                 Start Automatic Game
               </button>
-              <button onClick={updateCard} className="block w-full text-left px-4 py-2 hover:bg-red-700">     Update Card          </button>
+              <button onClick={() => fetchCardData("PUT", cardValue)} className="block w-full text-left px-4 py-2 hover:bg-red-700">     Update Card          </button>
             </div>
           )}
         </div>
@@ -473,7 +488,7 @@ const AndarBaharSection = ({
     if (isAutoFetching) {
       const interval = setInterval(() => {
         fetchCardData("POST");
-      }, 5000);
+      }, 500);
 
       return () => clearInterval(interval); // Cleanup on unmount
     }

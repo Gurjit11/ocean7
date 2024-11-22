@@ -5,15 +5,18 @@ import "./index.css";
 import { PlayerProvider } from "./context/PlayerContext.jsx";
 import { FlipProvider } from "./context/FlipContext.jsx";
 import { DataProvider } from './context/DataContext';
+import { PlayerPutProvider } from "./context/PlayerPutContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <PlayerProvider>
-      <FlipProvider>
-        <DataProvider>
-        <App />
-        </DataProvider>
-        </FlipProvider>
-    </PlayerProvider>
+    <PlayerPutProvider>
+      <PlayerProvider>
+        <FlipProvider>
+          <DataProvider>
+          <App />
+          </DataProvider>
+          </FlipProvider>
+      </PlayerProvider>
+    </PlayerPutProvider>
   </StrictMode>
 );

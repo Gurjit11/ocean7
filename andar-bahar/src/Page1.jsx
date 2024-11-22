@@ -65,33 +65,7 @@ const JokerAndCards = () => {
   //            console.log("reload now")
 
   //     } else {
-  //       console.log("No reset, timestamp is the same");
-  //       console.log("Current timestamp:", currentTimestamp);
-  //       console.log("last timestamp:", lastTimestamp);
-
-
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking reset status:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   const fetchTimestamp = async () => {
-  //     try {
-  //       const response = await axios.get("http://127.0.0.1:8000/myapp/api/reset_collections/");
-  //       if (response.data && response.data.timestamp) {
-  //         setLastTimestamp(response.data.timestamp); // Store the initial timestamp
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching initial timestamp:", error);
-  //     }
-  //   };
-    
-  //   fetchTimestamp();
-  // }, []);
-
-
-  // Initial fetch for the joker value
+  const [prevId,setPrevId] = useState(null);
   const fetchJokerValue = () => {
     axios
       .get("http://127.0.0.1:8000/myapp/api/get_joker_value/")
@@ -109,7 +83,6 @@ const JokerAndCards = () => {
       });
   };
 
-  // Fetch the joker value on component mount
   useEffect(() => {
     fetchJokerValue();
   }, []);
@@ -120,13 +93,41 @@ const JokerAndCards = () => {
       if (response.data) {
         const newCard = response.data.value;
         const sectionId = response.data.section_id;
+        const documentId= response.data.document_id;
+console.log("documentId",documentId);
+console.log("prevId",prevId);
 
-        if (sectionId === 1) {
-          setSection0Cards((prev) => [...prev, newCard]);
-          revealCard(newCard, "section0");
-        } else if (sectionId === 0) {
-          setSection1Cards((prev) => [...prev, newCard]);
-          revealCard(newCard, "section1");
+        if (sectionId === 0) {
+          if (prevId !== documentId){
+            setSection0Cards((prev) => [...prev, newCard]);
+            revealCard(newCard, "section0");
+          }
+          else{
+            setSection1Cards((prev) => {
+                const updatedCards = [...prev];
+                updatedCards.pop(); // Remove the last card
+                updatedCards.push(newCard); // Add the new card
+                return updatedCards;
+            });
+            revealCard(newCard, "section0");
+        }
+
+         
+        } else if (sectionId === 1) {
+
+          if (prevId !== documentId){
+            setSection1Cards((prev) => [...prev, newCard]);
+            revealCard(newCard, "section1");
+          }
+          else {
+            setSection0Cards((prev) => {
+                const updatedCards = [...prev];
+                updatedCards.pop(); // Remove the last card
+                updatedCards.push(newCard); // Add the new card
+                return updatedCards;
+            });
+            revealCard(newCard, "section1");
+        }
         }
 
         const result = response.data.result;
@@ -161,12 +162,6 @@ const JokerAndCards = () => {
     const intervalId = setInterval(fetchCardData, 500);
     return () => clearInterval(intervalId);
   }, []);
-
-  // Periodic check for the reset status
-  // useEffect(() => {
-  //   const resetCheckInterval = setInterval(checkResetStatus, 10000); // Check every second
-  //   return () => clearInterval(resetCheckInterval);
-  // }, []);
   const handleWin = () => {
     setShowModal(true);
   };
@@ -307,17 +302,6 @@ const Statistics = () => {
         console.error("Error fetching recent wins:", error);
       }
     };
-
-    // Rendering the percentages
-    // return (
-    //   <div>
-    //     {Object.entries(winPercentages).map(([sectionId, percentage]) => (
-    //       <div key={sectionId}>
-    //         Section {sectionId}: {percentage}%
-    //       </div>
-    //     ))}
-    //   </div>
-    // );
     console.log(winPercentages);
     fetchRecentWins();
   }, []);
@@ -326,20 +310,7 @@ const Statistics = () => {
       <div className="text-center font-ramaraja text-4xl font-bold ">
         STATISTICS
       </div>
-      {/* <div className="flex relative justify-center h-16 items-center space-x-2">
-        <span className="absolute text-xs  top-2.5 left-40">
-          {winPercentages[0]}
-        </span>
-        <img
-          src={stat}
-          alt="stats"
-          className="w-[60%]  mt-[-10px]"
-          // className="absolute left-1/2  transform -translate-x-1/2  h-24 mx-auto"
-        />
-        <span className="absolute text-xs  top-2.5 right-40">
-          {winPercentages[1]}
-        </span>
-      </div> */}
+
       <div className="flex justify-center items-center overflow-clip -mt-5 space-x-2 bg-brown-800 p-4 rounded-lg">
         {/* A Coin Side */}
         <div className="flex justify-center items-center w-[100%] relative">

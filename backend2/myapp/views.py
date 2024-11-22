@@ -521,7 +521,6 @@ def assign_card_to_section_A(request):
                 "joker": joker,
             })
 
-        # PUT Request: Update the latest card value
         elif request.method == "PUT":
             try:
                 # Parse the request body for the new value
@@ -539,13 +538,14 @@ def assign_card_to_section_A(request):
                 # Update the latest document with the new value and reset isRead to 0
                 mongo_helper.collection.update_one(
                     {"_id": latest_document["_id"]},  # Use the _id of the latest document
-                    {"$set": {"value": new_value, "isRead": 0}}
+                    {"$set": {"value": new_value, "isRead": 0, "isRead2":0}}
                 )
                 print(f"Updated latest document {latest_document['_id']} with value: {new_value} and reset isRead to 0")
 
                 # Simulate assignment logic for the response
-                section_id = card_assignment_counter % 2  # Keep section_id logic consistent
-                card_assignment_counter += 1
+                card_assignment_counter -= 1
+                section_id = (card_assignment_counter) % 2
+                # card_assignment_counter -= 1
                 card_value = extract_number_from_name(new_value)
 
                 # Check if the new card matches the joker
@@ -576,16 +576,13 @@ def assign_card_to_section_A(request):
         print(f"Unexpected error: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
 
+prev_id=""
 @csrf_exempt
 def assign_card_to_player(request):
     global joker
     global card_assignment_counter2
-    print("NICE")
-
+    global prev_id
     try:
-        
-        # print(f"{card_assignment_counter2}:card_assignment_counter")
-        # Fetch the latest card value from MongoDB
         value = None
         latest_document = mongo_helper.collection.find({"isRead2":0})  # Fetch the latest document
         for doc in latest_document:
@@ -595,37 +592,45 @@ def assign_card_to_player(request):
             print(value)
             card_value=extract_number_from_name(value)
             print(card_value)
-             # Assuming 'value' is the card name or number
+            document_id = str(doc.get('_id')) 
 
-        if not value:
-            return JsonResponse({"error": "No card value found in MongoDB"}, status=500)
+        # if prev_id==document_id:
+        #     section_id = card_assignment_counter2 % 2
 
-       
-        # # Check if all cards for the section have already been assigned
-        # if len(cardState['assignedCardIndices'][section_id]) >= len(cards) // 2:  # Assuming each section gets half the cards
-        #     return JsonResponse({"error": "All cards assigned in this section"}, status=400)
+        #     if card_value == joker:
+        #         result = f"{section_id} wins"
+        #         mongo_helper.db.wins.insert_one({
+        #             "section_id": section_id,
+        #             "result": "win"
+        #         })
+        #     mongo_helper.collection.update_one(
+        #         {"value": value, "isRead2": 0},
+        #         {"$set": {"isRead2": 1}}
+        #     )
+        
 
-        # Extract the number from the joker card's name, if jokerCard is assigned
-        print("joker is here "+str(joker))
+        # # Respond with the assigned card and result
+        #     return JsonResponse({
+        #         "success": True,
+        #         "card": card_value,
+        #         "value": value,
+        #         "section_id": section_id,
+        #         "result": result,
+        #         "joker":joker,
+        #         "document_id": document_id
+        #     })
+        
         if card_value == joker:
             result = f"{section_id} wins"
             mongo_helper.db.wins.insert_one({
                 "section_id": section_id,
                 "result": "win"
             })
-           
-        else:
-            result = "Card assigned, no match"
-
-            
-
-
         mongo_helper.collection.update_one(
             {"value": value, "isRead2": 0},
             {"$set": {"isRead2": 1}}
         )
-        print(f"Updated card card {value} with isRead2: 1")
-        print(joker)
+        
 
         # Respond with the assigned card and result
         return JsonResponse({
@@ -635,10 +640,13 @@ def assign_card_to_player(request):
             "section_id": section_id,
             "result": result,
             "joker":joker,
-            # "state": cardState
+            "document_id": document_id
         })
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+
 
 
 
