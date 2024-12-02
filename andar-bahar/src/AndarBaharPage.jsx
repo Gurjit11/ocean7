@@ -219,6 +219,8 @@ const TopMenu = ({ sectionId, fetchCardData }) => {
   const [showCardPopup, setShowCardPopup] = useState(false); // To toggle the popup
   const [showAddCardPopup, setShowAddCardPopup] = useState(false); // To toggle the popup
   const [showStartDropdown, setShowStartDropdown] = useState(false);
+  const [showWinModal, setShowWinModal] = useState(false);
+  const [selectedWinType, setSelectedWinType] = useState("");
   const [isPushing, setIsPushing] = useState(false); // To track if pushing is active
 
   const cardNumbers = [
@@ -424,6 +426,31 @@ const TopMenu = ({ sectionId, fetchCardData }) => {
       console.error("Error resetting collections:", error);
     }
     window.location.reload();
+  };
+
+  const setWinAPI = async () => {
+    try {
+      console.log("Setting win for:", selectedWinType);
+      const response = await fetch("http://127.0.0.1:8000/myapp/api/set_win/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          section_id: selectedWinType === "andar" ? 0 : 1,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Success:", data);
+      } else {
+        const errorData = await response.json();
+        console.error("Error:", errorData);
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+    }
   };
 
   const [currentPlayers, setCurrentPlayers] = useState([]);
@@ -745,6 +772,70 @@ const TopMenu = ({ sectionId, fetchCardData }) => {
                       </button>
                       <button
                         onClick={handleCardAdd}
+                        className="bg-red-700 text-yellow-300 px-4 py-2 rounded-md hover:bg-red-800"
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={() => setShowWinModal(true)}
+                className="block w-full text-left px-4 py-2 hover:bg-red-700"
+              >
+                Custom Win
+              </button>{" "}
+              {showWinModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                  <div className="bg-[#971909] border-2 border-yellow-600 rounded-lg p-6 w-80 shadow-lg">
+                    <h2 className="text-yellow-300 text-lg mb-4 text-center">
+                      Record Win
+                    </h2>
+
+                    <div className="mb-4">
+                      <label
+                        htmlFor="win-type"
+                        className="block text-yellow-300 mb-2"
+                      >
+                        Select Win Type
+                      </label>
+                      <select
+                        id="win-type"
+                        value={selectedWinType}
+                        onChange={(e) => setSelectedWinType(e.target.value)}
+                        className="p-2 w-full border bg-[#971909] text-yellow-300 border-yellow-600 rounded-md"
+                      >
+                        <option
+                          value=""
+                          className="bg-[#971909] text-yellow-300"
+                        >
+                          -- Select Win Type --
+                        </option>
+                        <option
+                          value="andar"
+                          className="bg-[#971909] text-yellow-300"
+                        >
+                          Andar Wins
+                        </option>
+                        <option
+                          value="bahar"
+                          className="bg-[#971909] text-yellow-300"
+                        >
+                          Bahar Wins
+                        </option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-between gap-2">
+                      <button
+                        onClick={() => setShowWinModal(false)}
+                        className="bg-gray-600 text-yellow-300 px-4 py-2 rounded-md hover:bg-gray-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={setWinAPI}
                         className="bg-red-700 text-yellow-300 px-4 py-2 rounded-md hover:bg-red-800"
                       >
                         Confirm
